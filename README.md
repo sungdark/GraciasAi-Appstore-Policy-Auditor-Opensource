@@ -1,13 +1,22 @@
 # Gracias AI - App Store Compliance Auditor (Open Source)
 
-AI-powered iOS App Store compliance auditor. Upload your `.ipa` file and get a comprehensive audit against Apple's Review Guidelines — before you submit.
+AI-powered compliance auditor for both **iOS App Store** and **Android Play Store**. Upload your `.ipa` or `.apk` file and get a comprehensive audit against the respective store's policies — before you submit.
+
+**Live at: [opensource.gracias.sh](https://opensource.gracias.sh)**
 
 **Live at: [opensource.gracias.sh](https://opensource.gracias.sh)**
 
 ## Features
 
+### iOS App Store Auditing
 - **IPA Analysis** — Upload `.ipa` files (up to 150MB) for automated compliance auditing
 - **Full Guidelines Coverage** — Checks all 6 major App Store Review Guideline categories: Safety, Performance, Business, Design, Legal & Privacy, and Technical
+
+### Android Play Store Auditing
+- **APK/AAB Analysis** — Upload `.apk` or `.aab` files for automated compliance auditing
+- **Full Policy Coverage** — Checks all major Play Store policy categories: Safety, Monetization & Payments, Privacy & Security, Functionality & Performance, and Technical Requirements
+
+### Shared Features
 - **Multi-Provider AI** — Bring your own key from Anthropic (Claude), OpenAI (GPT), Google Gemini, or OpenRouter
 - **Model Selection** — Choose specific models per provider (Claude Sonnet 4, GPT-4o, Gemini 2.5 Flash, etc.)
 - **Real-Time Streaming** — Watch your audit report generate live as the AI analyzes your code
@@ -23,7 +32,7 @@ AI-powered iOS App Store compliance auditor. Upload your `.ipa` file and get a c
 | Backend | Next.js API Routes (Node.js) |
 | Database | MongoDB (Mongoose) |
 | AI Providers | Anthropic, OpenAI, Google Gemini, OpenRouter |
-| File Processing | Busboy (streaming uploads), `unzip` (IPA extraction) |
+| File Processing | Busboy (streaming uploads), `unzip` (IPA/APK extraction) |
 | Export | html2pdf.js, React Markdown |
 
 ## Getting Started
@@ -62,8 +71,11 @@ npm start
 
 ## How It Works
 
-1. **Upload** — Drop your `.ipa` file. The server streams it to disk via Busboy without buffering in memory.
-2. **Extract** — The IPA is unzipped and all relevant source files are collected (`.swift`, `.m`, `.plist`, `.entitlements`, `.storyboard`, `.xcprivacy`, etc.). Binary files and build artifacts are skipped.
+1. **Upload** — Drop your `.ipa` or `.apk` file. The server streams it to disk via Busboy without buffering in memory.
+2. **Extract** — The app bundle is unzipped and all relevant source files are collected:
+   - iOS: `.swift`, `.m`, `.plist`, `.entitlements`, `.storyboard`, `.xcprivacy`, etc.
+   - Android: `.java`, `.kt`, `.xml`, `.gradle`, `AndroidManifest.xml`, etc.
+   Binary files and build artifacts are skipped.
 3. **Analyze** — Source files are sent to your chosen AI provider with a structured audit prompt. The response streams back in real-time.
 4. **Report** — You get a structured compliance report with pass/fail indicators, severity ratings, and a prioritized remediation plan.
 
@@ -72,6 +84,7 @@ npm start
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | `POST` | `/api/audit` | Upload IPA, stream AI audit report |
+| `POST` | `/api/android-audit` | Upload APK, stream AI audit report |
 | `POST` | `/api/save-report` | Save report to MongoDB |
 | `GET` | `/api/visitor` | Increment and return visitor count |
 
@@ -98,6 +111,10 @@ The script sets up Node.js 20, PM2, Nginx (with streaming/upload support), and U
 - **Binary detection** — Binary plists and compiled files are detected and skipped
 - **Rate limiting** — 5 requests per IP per minute via in-memory LRU cache
 - **Prompt injection guards** — System/user message separation with explicit instructions to treat file contents as data only
+
+## Android Play Store Auditor
+
+The Android Play Store auditor is available in the `android/` directory. See [`android/README.md`](android/README.md) for details.
 
 ## Contributing
 
